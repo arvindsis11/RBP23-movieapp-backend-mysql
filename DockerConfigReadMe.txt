@@ -5,6 +5,9 @@ ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} app.jar
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","/app.jar"]
+/***********************MYSQL on docker************************/
+docker run -d --name mysqldb -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=usersdb -p 3306:3306 mysql:latest
+
 /**********************/
 /**********************/
 spring.data.mongodb.host=host.docker.internal
@@ -27,3 +30,5 @@ docker stop <containerId>
 docker ps
 docker container ls -a
 docker logs <ContainerID>
+#delete containers
+docker rm <container_id1> <container_id2>

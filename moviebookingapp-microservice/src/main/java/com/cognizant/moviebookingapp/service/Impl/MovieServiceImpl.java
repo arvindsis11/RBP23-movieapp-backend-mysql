@@ -16,7 +16,7 @@ import com.cognizant.moviebookingapp.repository.MovieRepository;
 import com.cognizant.moviebookingapp.service.MovieService;
 
 @Service
-public class MovieServiceImpl implements MovieService {// --fix reponse entity
+public class MovieServiceImpl implements MovieService {
 
 	@Autowired
 	MovieRepository movieRepo;
@@ -28,11 +28,6 @@ public class MovieServiceImpl implements MovieService {// --fix reponse entity
 		if (movieRepo.existsByMovieName(movie.getMovieName())) {
 			return new ResponseEntity<>("movie already exists", HttpStatus.CONFLICT);
 		}
-		if (movie.getTotalTickets() > 0) {
-			movie.setTicketStatus("BOOK ASAP");
-			return new ResponseEntity<>(movieRepo.save(movie), HttpStatus.CREATED);
-		}
-		movie.setTicketStatus("SOLD OUT");
 		return new ResponseEntity<>(movieRepo.save(movie), HttpStatus.CREATED);
 	}
 
@@ -66,9 +61,7 @@ public class MovieServiceImpl implements MovieService {// --fix reponse entity
 
 		Optional<Movie> movie = movieRepo.findByMovieName(movieName);
 		if (movie.isPresent()) {
-//			int prevTotal = movie.get().getTotalTickets();
-//			int totalCountTickets = sumTickets + prevTotal;
-			movie.get().setTotalTickets(sumTickets);// update total count of tickets
+			movie.get().setTotalTickets(sumTickets);
 			movie.get().setTicketStatus("BOOK ASAP");
 			movieRepo.save(movie.get());
 			return new ResponseEntity<>("ticket status updated: " + sumTickets, HttpStatus.OK);
@@ -78,7 +71,6 @@ public class MovieServiceImpl implements MovieService {// --fix reponse entity
 
 	@Override
 	public ResponseEntity<?> getBookedTicketList(String movieName) {
-		// get tickets from moviedb that are already booked
 		Optional<Movie> movie = movieRepo.findByMovieName(movieName);
 		if (movie.isEmpty()) {
 			return new ResponseEntity<>("movie not found", HttpStatus.NOT_FOUND);

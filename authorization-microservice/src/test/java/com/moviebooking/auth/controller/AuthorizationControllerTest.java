@@ -106,21 +106,28 @@ class AuthorizationControllerTest {
 		ResetDto resetobj = new ResetDto(username, "newpass", "secquestion", "secanswer");
 		when(userService.updatePassword(any(ResetDto.class))).thenReturn(new ResponseEntity<>(HttpStatus.OK));
 
-		mockMvc.perform(patch("/api/v1.0/auth/forgot").content(toJson(resetobj))
-				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+		mockMvc.perform(patch("/api/v1.0/auth/forgot").content(toJson(resetobj)).contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 
 	}
 
 	@Test
 	void testGetAllUsers() throws Exception {
-		User userObj1 = new User("admin", "test@gmail.com", "arvind@123", "pet", "testpet");
-		User userObj2 = new User("admin", "test@gmail.com", "arvind@123", "pet", "testpet");
-		List<User> userList = Stream.of(userObj1, userObj2).collect(Collectors.toList());
-		when(userService.getAllUsers()).thenReturn(userList);
-//		ObjectMapper mapper = new ObjectMapper();
-		mockMvc.perform(get("/api/v1.0/auth/getAllUsers").contentType(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-				.andExpect(content().json(toJson(userList)));
+		String token = "Bearer test-token";
+		String authToken = token.substring(7);
+		when(jwtTokenUtil.getRoleFromToken(authToken)).thenReturn("ROLE_ADMIN");
+		when(userService.getAllUsers()).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+		mockMvc.perform(get("/api/v1.0/auth/getAllUsers").header("Authorization", token)).andExpect(status().isOk());
+	}
+
+	@Test
+	void testGetAllUsersInvalidUser() throws Exception {
+		String token = "Bearer test-token";
+		String authToken = token.substring(7);
+		when(jwtTokenUtil.getRoleFromToken(authToken)).thenReturn("ROLE_CUSTOMER");
+		when(userService.getAllUsers()).thenReturn(new ResponseEntity<>(HttpStatus.FORBIDDEN));
+		mockMvc.perform(get("/api/v1.0/auth/getAllUsers").header("Authorization", token))
+				.andExpect(status().isForbidden());
 	}
 
 	public static String toJson(Object obj) throws Exception {

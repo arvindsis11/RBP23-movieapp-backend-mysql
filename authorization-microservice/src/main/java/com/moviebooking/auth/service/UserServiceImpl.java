@@ -2,7 +2,6 @@ package com.moviebooking.auth.service;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -31,7 +30,6 @@ public class UserServiceImpl implements UserService {
 
 	Map<String, String> mapObj = new HashMap<>();
 
-	// for registration
 	@Override
 	public ResponseEntity<?> addUser(SignupDto signupDto) {
 		if (userRepository.existsByUsername(signupDto.getUsername())
@@ -45,12 +43,24 @@ public class UserServiceImpl implements UserService {
 		Set<String> strRoles = signupDto.getRoles();
 		Set<Role> roles = new HashSet<>();
 		if (strRoles == null) {
-			Role userRole = roleRepository.findByName("ROLE_CUSTOMER").orElseThrow(() -> new InvalidInputException("Role not found"));
-       // need to add roles manually into db
+			Role userRole = roleRepository.findByName("ROLE_CUSTOMER")
+					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
 			roles.add(userRole);
 		} else {
-			Role adminRole = roleRepository.findByName("ROLE_ADMIN").orElseThrow(() -> new InvalidInputException("Role not found"));
-			roles.add(adminRole);// fix-me
+			strRoles.forEach(role -> {
+				switch (role) {
+				case "admin":
+					Role adminRole = roleRepository.findByName("ROLE_ADMIN")
+							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+					roles.add(adminRole);
+
+					break;
+				default:
+					Role userRole = roleRepository.findByName("ROLE_CUSTOMER")
+							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+					roles.add(userRole);
+				}
+			});
 		}
 
 		user.setRoles(roles);
@@ -59,7 +69,6 @@ public class UserServiceImpl implements UserService {
 		return new ResponseEntity<>(mapObj, HttpStatus.OK);
 	}
 
-	// for login
 	@Override
 	public boolean loginUser(LoginDto loginRequest) {
 
@@ -71,8 +80,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseEntity<?> updatePassword(ResetDto resetDto) {// fix--me no need of username
-																// here
+	public ResponseEntity<?> updatePassword(ResetDto resetDto) {
+
 		if (!userRepository.existsByUsername(resetDto.getUsername())) {
 			mapObj.put("msg", "Username doesn't exists!");
 			return new ResponseEntity<>(mapObj, HttpStatus.BAD_REQUEST);
@@ -92,8 +101,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Optional<User> getUserByUsername(String username) {
-		// TODO for loading the user from db
-		Optional<User> user = userRepository.findByUsername(username);// fix me--handle exceptions here
+		Optional<User> user = userRepository.findByUsername(username);
 		if (user.isEmpty()) {
 			throw new InvalidInputException("username is not present");
 		}
@@ -101,8 +109,20 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<User> getAllUsers() {
-		return userRepository.findAll();
+	public ResponseEntity<?> getAllUsers() {
+		return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<?> deleteUser(Long userId) {
+		Optional<User> userData = userRepository.findById(userId);
+		if (userData.isEmpty()) {
+			mapObj.put("msg", "can not delete user!");
+			return new ResponseEntity<>(mapObj, HttpStatus.BAD_REQUEST);
+		}
+		userRepository.deleteById(userId);
+		mapObj.put("msg", "user " + userData.get().getUsername() + " deleted successfully!");
+		return new ResponseEntity<>(mapObj, HttpStatus.OK);
 	}
 
 }

@@ -1,0 +1,15 @@
+https://www.javaguides.net/2022/12/deploy-spring-boot-mysql-application-to-docker.html
+docker network create springboot-mysql-net
+#step:1
+docker run --network moviebooking-network -d --name mysqldb -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=usersdb -p 3307:3306 mysql:latest
+#step:2-->use mysql shell
+docker exec -it mysqldb bash
+mysql -h localhost -P 3307 -u root -p
+
+###step--1
+docker build -t authapp_movie .
+docker build -t moviebook_app .
+
+###step--2:
+step2: docker run --network moviebooking-network -d --name auth-app-docker -p 8080:8080 authapp_movie
+step3: docker run --network moviebooking-network -d --name movie-app-docker -p 8081:8081 moviebook_app

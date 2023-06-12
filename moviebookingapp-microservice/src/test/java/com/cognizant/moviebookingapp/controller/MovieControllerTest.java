@@ -28,7 +28,6 @@ import com.cognizant.moviebookingapp.model.Movie;
 import com.cognizant.moviebookingapp.model.Ticket;
 import com.cognizant.moviebookingapp.service.MovieService;
 import com.cognizant.moviebookingapp.service.TicketService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest

@@ -1,6 +1,5 @@
 package com.moviebooking.auth.service;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
@@ -17,11 +16,12 @@ public interface UserService {
 	// this will work like a authentication manager for validating user
 	public boolean loginUser(LoginDto loginDto);
 
-	public List<User> getAllUsers();
+	public ResponseEntity<?> getAllUsers();
 
-	// replicating spring inbuit class--fix here
 	public Optional<User> getUserByUsername(String username);
 
 	public ResponseEntity<?> updatePassword(ResetDto resetDto);
+
+	public ResponseEntity<?> deleteUser(Long userId);
 
 }

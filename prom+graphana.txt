@@ -68,7 +68,7 @@ management.endpoint.health.show-details=always
 
 12.Open promethues.yml location --> open cmd from there -->Run the prometheus using the following command:-
 	docker run -p 9090:9090 [path of our promethues.yml] [prometheus container name]
- eg: docker run -p 9090:9090 promethues.yml prom/prometheus
+ eg: docker run -p 9090:9090 -v promethues.yml prom/prometheus
 
 13. Open localhost:9090/graph
 14. Select any query and execute
@@ -77,4 +77,4 @@ management.endpoint.health.show-details=always
 17. Username: admin  Password:admin
 18. Create a new Data Soure--> Give URL as localhost:9090
 19. Add New Dashboard -->Give query in metrics browser :process_start_time_seconds and press "Run Queries"
---imp_if there is issue with graphana using machine ip address
+--imp_if there is issue with graphana using machine ip address--use ifconfig find ip and put it there

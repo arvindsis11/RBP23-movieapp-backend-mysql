@@ -84,21 +84,7 @@ public class MovieController {
 
 	}
 
-	@PutMapping("/{movieName}/update/{sumTickets}")
-	@Operation(summary = "for update of tickets into a movie(admin)")
-	public ResponseEntity<?> updateTicketStatus(@PathVariable(value = "movieName") String movieName,
-			@PathVariable(value = "sumTickets") int sumTickets,
-			@Parameter(hidden = true) @RequestHeader("Authorization") String token) throws AuthorizationException {
-		Map<String, String> userInfo = authService.validateToken(token);
-		if (userInfo.containsValue("ROLE_ADMIN")) {
-			return movieService.updateMovie(movieName, sumTickets);
-		} else {
-			throw new AuthorizationException("Access Denied");
-		}
-
-	}
-
-	@DeleteMapping("/delete/{movieId}") // instead use moviename better approach
+	@DeleteMapping("/delete/{movieId}")
 	@Operation(summary = "for deletion of movie(admin)")
 	public ResponseEntity<?> deleteMovieById(@PathVariable(value = "movieId") Long movieId,
 			@Parameter(hidden = true) @RequestHeader("Authorization") String token) throws AuthorizationException {
@@ -168,7 +154,6 @@ public class MovieController {
 
 	}
 
-	// experimental--
 	@PutMapping("/update/{movieName}")
 	@Operation(summary = "for update of tickets into a movie(admin)")
 	public ResponseEntity<?> updateMovieV2(@PathVariable(value = "movieName") String movieName,
